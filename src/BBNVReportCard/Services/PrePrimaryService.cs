@@ -174,22 +174,62 @@ public class PrePrimaryService
         return result is int i ? i : null;
     }
 
-    // Fetch all students in a class for class-list view
-    public async Task<List<(int StudentId, string RollNo, string Name)>> GetClassStudentsAsync(
-        string className, string academicYear)
+    // ── Batch (class group) listing — mirrors macro's BATCHID logic ──────────
+    // Returns distinct batches that have Pre-Primary data for the given year.
+    public async Task<List<(int BatchId, string ClassName)>> GetBatchesAsync(string academicYear)
     {
+        // Macro query: SELECT CLASSROLLNO FROM STUDENTS WHERE ACTIVE=1 AND DELETED=0
+        //              AND BATCHID=? AND STUDENTID IN (SELECT STUDENTID FROM View_ReportCard_Pre_Primary)
+        // We reverse-lookup to get available batches.
         const string sql = @"
-            SELECT DISTINCT StudentId, RollNo, StudentName
-            FROM   View_ReportCard_Pre_Primary
-            WHERE  Class   = @Class
-              AND  Session = @Session
-            ORDER BY RollNo";
+            SELECT DISTINCT s.BATCHID, s.CLASS
+            FROM   STUDENTS s
+            WHERE  s.ACTIVE   = 1
+              AND  s.DELETED  = 0
+              AND  s.STUDENTID IN (
+                       SELECT STUDENTID
+                       FROM   View_ReportCard_Pre_Primary
+                       WHERE  Session = @Session
+                   )
+            ORDER BY s.CLASS";
+
+        var list = new List<(int, string)>();
+        using var conn = new SqlConnection(_connectionString);
+        await conn.OpenAsync();
+        using var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@Session", academicYear);
+        using var r = await cmd.ExecuteReaderAsync();
+        while (await r.ReadAsync())
+            list.Add((r.GetInt32(0), r.IsDBNull(1) ? r.GetInt32(0).ToString() : r.GetString(1)));
+        return list;
+    }
+
+    // Fetch all students in a batch — exact mirror of the macro's loop logic
+    public async Task<List<(int StudentId, string RollNo, string Name)>> GetBatchStudentsAsync(
+        int batchId, string academicYear)
+    {
+        // Matches macro: SELECT CLASSROLLNO FROM STUDENTS
+        //                WHERE ACTIVE=1 AND DELETED=0 AND BATCHID=?
+        //                AND STUDENTID IN (SELECT STUDENTID FROM View_ReportCard_Pre_Primary)
+        //                ORDER BY 1
+        const string sql = @"
+            SELECT s.STUDENTID, s.CLASSROLLNO, v.StudentName
+            FROM   STUDENTS s
+            JOIN   (
+                       SELECT DISTINCT StudentId, StudentName
+                       FROM   View_ReportCard_Pre_Primary
+                       WHERE  Session = @Session
+                   ) v ON v.StudentId = s.STUDENTID
+            WHERE  s.ACTIVE   = 1
+              AND  s.DELETED  = 0
+              AND  s.BATCHID  = @BatchId
+            ORDER BY s.CLASSROLLNO";
 
         var list = new List<(int, string, string)>();
         using var conn = new SqlConnection(_connectionString);
         await conn.OpenAsync();
         using var cmd = new SqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@Class",   className);
+        cmd.Parameters.AddWithValue("@BatchId", batchId);
         cmd.Parameters.AddWithValue("@Session", academicYear);
         using var r = await cmd.ExecuteReaderAsync();
         while (await r.ReadAsync())

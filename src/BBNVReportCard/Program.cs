@@ -3,6 +3,9 @@ using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load local overrides (gitignored — safe for real connection strings / secrets)
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ReportCardService>();
 builder.Services.AddScoped<PrePrimaryService>();
