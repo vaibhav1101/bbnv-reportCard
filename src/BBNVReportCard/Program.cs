@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ReportCardService>();
+builder.Services.AddScoped<PrePrimaryService>();
 
 var app = builder.Build();
 

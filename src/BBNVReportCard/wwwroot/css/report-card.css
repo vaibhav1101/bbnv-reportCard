@@ -126,6 +126,115 @@
 }
 
 /* =============================================
+   PRE-PRIMARY REPORT CARD STYLES
+   ============================================= */
+
+.pp-page {
+    max-width: 960px;
+    margin: 0 auto 20px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12px;
+    background: #fff;
+    padding: 10px 14px;
+    border: 1px solid #333;
+}
+
+/* Header */
+.pp-header-table { border-collapse: collapse; margin-bottom: 2px; }
+.pp-logo-cell { vertical-align: middle; padding-right: 8px; }
+.pp-logo-placeholder {
+    display: inline-block; width: 70px; height: 70px;
+    border: 2px solid #c0392b; border-radius: 50%;
+    line-height: 70px; text-align: center;
+    font-size: 16px; font-weight: bold; color: #c0392b;
+}
+.pp-school-name {
+    font-size: 18px; font-weight: bold;
+    color: #c0392b; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.pp-school-sub { font-size: 12px; font-weight: bold; color: #c0392b; }
+.pp-report-title {
+    display: inline-block; border: 1.5px solid #333;
+    padding: 2px 18px; font-weight: bold; font-size: 13px;
+    margin-top: 4px;
+}
+.pp-codes { font-size: 11px; margin: 2px 0 4px; }
+
+/* Student info row */
+.pp-info-row { border-collapse: collapse; margin-bottom: 3px; font-size: 12px; }
+.pp-info-row td { padding: 1px 6px; }
+
+/* Marks table */
+.pp-marks-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 11px;
+}
+.pp-marks-table th, .pp-marks-table td {
+    border: 1px solid #333;
+    padding: 2px 3px;
+    vertical-align: middle;
+}
+.pp-thead-top th {
+    background-color: #1a3a6b;
+    color: #fff;
+    font-size: 11px;
+    text-align: center;
+}
+.pp-thead-sub th {
+    background-color: #d6e4f0;
+    font-size: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+.pp-subject-col { width: 130px; font-weight: bold; }
+.pp-subject-name { font-size: 11px; }
+.pp-grand-total td { font-weight: bold; background-color: #f5f5f5; }
+.pp-grade-label { font-size: 9px; color: #555; }
+.pp-bold { font-weight: bold; }
+.pp-fail { color: #c0392b; font-weight: bold; }
+.pp-fail-text { color: #c0392b; font-weight: bold; }
+.pp-pass { color: #1a7a1a; font-weight: bold; }
+.pp-sign-row td { height: 22px; }
+
+/* Bottom table */
+.pp-bottom-table { border-collapse: collapse; margin-top: 0; font-size: 11px; }
+.pp-bottom-table td { border: 1px solid #333; }
+.pp-reopen-cell { padding: 6px 8px; vertical-align: bottom; }
+.pp-summary-cell { padding: 4px 6px; font-size: 11px; }
+.pp-summary-cell table td { padding: 1px 3px; border: none; }
+.pp-sign-label { font-size: 10px; font-style: italic; padding-right: 4px; }
+
+/* Page 2 */
+.pp-page-break { page-break-after: always; height: 20px; }
+.pp-back { border: none; padding: 14px; }
+
+.pp-rules-cell { padding-right: 10px; font-size: 11px; }
+.pp-rules-title {
+    font-weight: bold; text-align: center; font-size: 13px;
+    text-decoration: underline; margin-bottom: 8px;
+    background-color: #333; color: #fff; padding: 3px;
+}
+.pp-rules-list { padding-left: 18px; margin: 0; }
+.pp-rules-list li { margin-bottom: 5px; line-height: 1.4; }
+.pp-promo-table { margin-top: 6px; font-size: 11px; border-collapse: collapse; }
+.pp-promo-table th, .pp-promo-table td { padding: 2px 8px; border: 1px solid #333; }
+.pp-promo-table th { background: #d6e4f0; }
+
+.pp-details-card {
+    border: 1.5px solid #333;
+    padding: 10px;
+    font-size: 11px;
+}
+.pp-details-title {
+    text-align: center; font-weight: bold; font-size: 13px;
+    border: 1.5px solid #333; padding: 3px; margin: 6px 0 4px;
+}
+.pp-detail-info { border-collapse: collapse; margin-top: 4px; }
+.pp-detail-info td { padding: 2px 4px; vertical-align: top; }
+.pp-detail-label { width: 100px; color: #555; }
+
+/* =============================================
    Print Styles — @media print
    ============================================= */
 @media print {
@@ -161,8 +270,35 @@
 
     a { text-decoration: none !important; color: inherit !important; }
 
+    /* Pre-Primary print overrides */
+    .pp-page { border: none; padding: 4mm 6mm; max-width: 100%; margin: 0; }
+    .pp-back  { padding: 4mm 6mm; }
+    .pp-page-break { page-break-after: always; height: 0; }
+    .pp-thead-top th {
+        background-color: #1a3a6b !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .pp-thead-sub th {
+        background-color: #d6e4f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .pp-grand-total td {
+        background-color: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .pp-rules-title {
+        background-color: #333 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
     @page {
         size: A4 portrait;
-        margin: 10mm;
+        margin: 8mm 10mm;
     }
 }

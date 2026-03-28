@@ -1,58 +1,369 @@
-@model ReportCardViewModel
+@model PrePrimaryReportCardViewModel
 @{
-    ViewData["Title"] = "Pre-Primary Report Card";
+    ViewData["Title"] = "Progress Report Card – " + Model.StudentName;
     Layout = "_Layout";
 }
 
-{{!-- ============================================================
-     FORMAT: PRE-PRIMARY  (Nursery / LKG / UKG)
-     TODO: Replace the section below with the actual BBNV
-           Pre-Primary report card layout once the format is shared.
-     ============================================================ --}}
-
+@* ── Action buttons (hidden on print) ── *@
 <div class="no-print mb-3 d-flex gap-2 justify-content-end">
     <a asp-action="Index" class="btn btn-outline-secondary">&#8592; Back</a>
-    <a asp-action="Pdf"
-       asp-route-studentId="@Model.Student.StudentId"
-       asp-route-term="@Model.Term"
+    <a asp-action="PdfPrePrimary"
+       asp-route-studentId="@Model.StudentId"
        asp-route-academicYear="@Model.AcademicYear"
        class="btn btn-danger">&#128438; Download PDF</a>
     <button onclick="window.print()" class="btn btn-outline-primary">&#128424; Print</button>
 </div>
 
-<div class="report-card">
-    <div class="rc-header text-center">
-        <div class="logo-placeholder">BBNV</div>
-        <h2 class="rc-school-name">@Model.SchoolName</h2>
-        <h4 class="rc-title">PRE-PRIMARY PROGRESS REPORT</h4>
-        <p class="rc-subtitle">Academic Year: @Model.AcademicYear &nbsp;|&nbsp; @Model.Term</p>
+@* ══════════════════════════════════════════════════════════════════
+   PAGE 1 — FRONT: REPORT CARD
+   ══════════════════════════════════════════════════════════════════ *@
+<div class="pp-page pp-front">
+
+    @* ── School header ── *@
+    <table class="pp-header-table" width="100%">
+        <tr>
+            <td width="90" class="pp-logo-cell">
+                <img src="~/images/school-logo.png" height="75" alt="BBNV Logo"
+                     onerror="this.outerHTML='<div class=pp-logo-placeholder>BBNV</div>'" />
+            </td>
+            <td class="text-center">
+                <div class="pp-school-name">@Model.SchoolName</div>
+                <div class="pp-school-sub">@Model.SchoolLine2</div>
+                <div class="pp-report-title">PROGRESS REPORT CARD</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="pp-codes">
+        Dise Code – @Model.DiseCode &nbsp;&nbsp;&nbsp; School Code - @Model.SchoolCode
     </div>
 
-    <hr class="rc-divider" />
+    @* ── Student info row ── *@
+    <table class="pp-info-row" width="100%">
+        <tr>
+            <td><strong>Name -&nbsp;</strong> @Model.StudentName</td>
+            <td><strong>Class -&nbsp;</strong> @Model.ClassName</td>
+            <td><strong>Year -&nbsp;</strong> @Model.AcademicYear</td>
+            <td><strong>Roll No. -&nbsp;</strong> @Model.RollNo</td>
+            <td><strong>Admission No. -&nbsp;</strong> @Model.AdmissionNo</td>
+        </tr>
+    </table>
 
-    <div class="rc-student-info">
-        <table class="table table-borderless rc-info-table">
-            <tbody>
+    @* ── Main marks + summary table ── *@
+    <table class="pp-marks-table" border="1" cellspacing="0" cellpadding="3" width="100%">
+        <thead>
+            <tr class="pp-thead-top">
+                <th rowspan="2" class="pp-subject-col">SUBJECT</th>
+                <th colspan="2">Quarterly Exam</th>
+                <th colspan="2">Half Yearly Exam</th>
+                <th colspan="2">Annual Exam</th>
+                <th colspan="4">Total Average</th>
+                <th rowspan="2">Remarks</th>
+            </tr>
+            <tr class="pp-thead-sub">
+                <th>MM</th><th>M. Obt.</th>
+                <th>MM</th><th>M. Obt.</th>
+                <th>MM</th><th>M. Obt</th>
+                <th>Quarterly<br />10%</th>
+                <th>Halfyearly<br />10%</th>
+                <th>Annual<br />80%</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Academic subjects *@
+            @foreach (var s in Model.AcademicSubjects)
+            {
                 <tr>
-                    <td><strong>Child's Name:</strong></td>
-                    <td>@Model.Student.StudentName</td>
-                    <td><strong>Class:</strong></td>
-                    <td>@Model.Student.ClassName</td>
+                    <td class="pp-subject-name">@s.DisplayName</td>
+                    <td class="text-center">@s.MaxMarks.ToString("0")</td>
+                    <td class="text-center @(s.QFailed ? "pp-fail" : "")">@s.QDisplay</td>
+                    <td class="text-center">@s.MaxMarks.ToString("0")</td>
+                    <td class="text-center @(s.HYFailed ? "pp-fail" : "")">@s.HYDisplay</td>
+                    <td class="text-center">@s.MaxMarks.ToString("0")</td>
+                    <td class="text-center @(s.AFailed ? "pp-fail" : "")">@s.ADisplay</td>
+                    <td class="text-center">@s.QWeighted.ToString("0.0")</td>
+                    <td class="text-center">@s.HYWeighted.ToString("0.0")</td>
+                    <td class="text-center">@s.AWeighted.ToString("0.0")</td>
+                    <td class="text-center pp-bold">@s.Total.ToString("0.0")</td>
+                    <td></td>
                 </tr>
-            </tbody>
-        </table>
-    </div>
+            }
 
-    {{!-- TODO: Add Pre-Primary specific sections here --}}
-    {{!-- Typical sections for Pre-Primary:            --}}
-    {{!--   - Personal & Social Development            --}}
-    {{!--   - Language & Literacy (oral, written)      --}}
-    {{!--   - Numeracy                                 --}}
-    {{!--   - Creative Arts                            --}}
-    {{!--   - Physical Development                     --}}
-    {{!--   - Grading scale: E/G/S/NI instead of marks --}}
+            @* Grand Total row *@
+            <tr class="pp-grand-total">
+                <td class="pp-bold">GRAND TOTAL</td>
+                <td class="text-center pp-bold">@Model.QTotalMax.ToString("0")</td>
+                <td class="text-center pp-bold">@Model.QTotalObt.ToString("0")</td>
+                <td class="text-center pp-bold">@Model.HYTotalMax.ToString("0")</td>
+                <td class="text-center pp-bold">@Model.HYTotalObt.ToString("0")</td>
+                <td class="text-center pp-bold">@Model.ATotalMax.ToString("0")</td>
+                <td class="text-center pp-bold">@Model.ATotalObt.ToString("0")</td>
+                <td class="text-center pp-bold">@Model.QWeightedTotal.ToString("0.0")</td>
+                <td class="text-center pp-bold">@Model.HYWeightedTotal.ToString("0.0")</td>
+                <td class="text-center pp-bold">@Model.AWeightedTotal.ToString("0.0")</td>
+                <td class="text-center pp-bold">@Model.GrandTotal.ToString("0.0")</td>
+                <td></td>
+            </tr>
 
-    <div class="alert alert-warning no-print mt-4">
-        <strong>Format Pending:</strong> Please share the Pre-Primary report card layout to complete this template.
-    </div>
+            @* Grade-only subjects (Drawing, Cleanliness) *@
+            @foreach (var g in Model.GradeOnlySubjects)
+            {
+                <tr>
+                    <td class="pp-subject-name">@g.DisplayName</td>
+                    <td class="text-center pp-grade-label">GRADE</td>
+                    <td class="text-center pp-bold">@g.QGrade</td>
+                    <td class="text-center pp-grade-label">GRADE</td>
+                    <td class="text-center pp-bold">@g.HYGrade</td>
+                    <td class="text-center pp-grade-label">GRADE</td>
+                    <td class="text-center pp-bold">@g.AGrade</td>
+                    <td colspan="4"></td>
+                    <td></td>
+                </tr>
+            }
+
+            @* Percentage row *@
+            <tr>
+                <td class="pp-bold">PERCENTAGE</td>
+                <td colspan="2" class="text-center pp-bold">
+                    @(Model.QPercentage.HasValue ? Model.QPercentage.Value.ToString("0.00") + "%" : "")
+                </td>
+                <td colspan="2" class="text-center pp-bold">
+                    @(Model.HYPercentage.HasValue ? Model.HYPercentage.Value.ToString("0.00") + "%" : "")
+                </td>
+                <td colspan="2" class="text-center pp-bold">
+                    @(Model.APercentage.HasValue ? Model.APercentage.Value.ToString("0.00") + "%" : "")
+                </td>
+                <td colspan="3"></td>
+                <td class="text-center pp-bold">
+                    @(Model.TotalPercentage.HasValue ? Model.TotalPercentage.Value.ToString("0.00") + "%" : "")
+                </td>
+                <td></td>
+            </tr>
+
+            @* Division *@
+            <tr>
+                <td>DIVISION</td>
+                <td colspan="2" class="text-center pp-bold">@Model.QDivision</td>
+                <td colspan="2" class="text-center pp-bold">@Model.HYDivision</td>
+                <td colspan="2" class="text-center pp-bold">@Model.ADivision</td>
+                <td colspan="5"></td>
+            </tr>
+
+            @* Pass/Fail/Promoted *@
+            <tr>
+                <td>PASS/FAIL/PROMOTED</td>
+                <td colspan="2" class="text-center pp-bold">@Model.QResult</td>
+                <td colspan="2" class="text-center pp-bold">@Model.HYResult</td>
+                <td colspan="2" class="text-center pp-bold">@Model.AResult</td>
+                <td colspan="5"></td>
+            </tr>
+
+            @* Class Teacher's Sign *@
+            <tr class="pp-sign-row">
+                <td>CLASS TEACHER'S SIGN</td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="5"></td>
+            </tr>
+
+            @* Attendance *@
+            <tr>
+                <td>ATTENDANCE</td>
+                <td colspan="2" class="text-center pp-bold">@Model.QAttendance</td>
+                <td colspan="2" class="text-center pp-bold">@Model.HYAttendance</td>
+                <td colspan="2" class="text-center pp-bold">@Model.AAttendance</td>
+                <td colspan="5"></td>
+            </tr>
+
+            @* Principal's Sign *@
+            <tr class="pp-sign-row">
+                <td>PRINCIPAL'S SIGN</td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="5"></td>
+            </tr>
+
+            @* Parent's Sign *@
+            <tr class="pp-sign-row">
+                <td>PARENT'S SIGN</td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="5"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    @* ── Bottom row: reopen notice + summary + signatures ── *@
+    <table class="pp-bottom-table" width="100%" border="1" cellspacing="0" cellpadding="4">
+        <tr>
+            @* Left: School reopen + sign lines *@
+            <td width="65%" class="pp-reopen-cell" valign="bottom">
+                <div>School Reopen on &nbsp;…………………………………………………………………</div>
+            </td>
+            @* Right: summary panel *@
+            <td width="35%" valign="top" class="pp-summary-cell">
+                <table width="100%" cellspacing="0" cellpadding="2">
+                    <tr><td>Quarterly -</td><td class="pp-bold">@Model.QuarterlyRemark</td></tr>
+                    <tr><td>HalfYearly -</td><td class="pp-bold">@Model.HalfYearlyRemark</td></tr>
+                    <tr><td>Annual Exam -</td><td class="pp-bold">@Model.AnnualRemark</td></tr>
+                    <tr><td>Total Average -</td><td></td></tr>
+                    <tr>
+                        <td>Marks -</td>
+                        <td class="pp-bold">@Model.GrandTotal.ToString("0.0")</td>
+                    </tr>
+                    <tr>
+                        <td>Percentage -</td>
+                        <td class="pp-bold">
+                            @(Model.TotalPercentage.HasValue ? Model.TotalPercentage.Value.ToString("0.00") + "%" : "")
+                        </td>
+                    </tr>
+                    <tr><td>Annual Result -</td><td></td></tr>
+                    <tr>
+                        <td>Result -</td>
+                        <td class="pp-bold @(Model.AResult == "Passed" ? "pp-pass" : "pp-fail-text")">
+                            @Model.AResult
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Percentage -</td>
+                        <td class="pp-bold">
+                            @(Model.APercentage.HasValue ? Model.APercentage.Value.ToString("0.00") + "%" : "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Rank in Class -</td>
+                        <td class="pp-bold">@(Model.RankInClass.HasValue ? Model.RankInClass.ToString() : "")</td>
+                    </tr>
+                    <tr class="pp-sign-row"><td colspan="2" style="height:30px;"></td></tr>
+                    <tr>
+                        <td colspan="2" class="text-end pp-sign-label">Class Teacher's Sign</td>
+                    </tr>
+                    <tr class="pp-sign-row"><td colspan="2" style="height:30px;"></td></tr>
+                    <tr>
+                        <td colspan="2" class="text-end pp-sign-label">Principal's Sign</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+
+@* ══════════════════════════════════════════════════════════════════
+   PAGE BREAK
+   ══════════════════════════════════════════════════════════════════ *@
+<div class="pp-page-break"></div>
+
+@* ══════════════════════════════════════════════════════════════════
+   PAGE 2 — BACK: Promotion Rules (left) + Student Details (right)
+   ══════════════════════════════════════════════════════════════════ *@
+<div class="pp-page pp-back">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr valign="top">
+
+            @* ── Left: Promotion Rules ── *@
+            <td width="45%" class="pp-rules-cell">
+                <div class="pp-rules-title">PROMOTION RULES</div>
+                <ol class="pp-rules-list">
+                    <li>This Report Card must be signed by the parent every exam and then must be
+                        returned to the class teacher within <strong>two</strong> days.</li>
+                    <li>Minimum passing Marks in each subject is 33%.</li>
+                    <li>Promotion will not be granted in case the attendance is less than 85% in the Year.</li>
+                    <li>If the card is lost or damaged a new one will be issued on payment of Rs. 50.00.</li>
+                    <li>Ranks will be awarded only for the first three positions.</li>
+                    <li>It is compulsary for all the students to pass in the quarterly, Half yearly and Annual Exam.</li>
+                    <li>" * " is marked for Failed in the subject. Marks will be awarded out of 50 for the terminals and final examination</li>
+                    <li>" + " is marked for Promotted Students.</li>
+                    <li>
+                        Promotion Criteria:
+                        <table class="pp-promo-table" border="1" cellspacing="0" cellpadding="3">
+                            <tr><th>DIVISION</th><th>MARKS</th></tr>
+                            <tr><td>First</td><td>60% and Above</td></tr>
+                            <tr><td>Second</td><td>45% and Above</td></tr>
+                            <tr><td>Third</td><td>35% and Above</td></tr>
+                            <tr><td>Fail</td><td>Below 35%</td></tr>
+                        </table>
+                    </li>
+                </ol>
+            </td>
+
+            <td width="10%"></td>
+
+            @* ── Right: Student Details card ── *@
+            <td width="45%">
+                <div class="pp-details-card">
+                    <div class="text-center pp-bold" style="font-size:14px;">BRAHMRISHI BAWRA</div>
+                    <div class="text-center pp-bold" style="font-size:14px;">NARMADA VIDYAPEETH SR. SEC. SCHOOL</div>
+                    <div class="text-center" style="font-size:11px; margin-top:2px;">RECOGNIZED BY GOVT. OF M.P.</div>
+                    <div class="text-center" style="font-size:10px;">@Model.SchoolAddress</div>
+                    <div class="text-center" style="font-size:10px;">Email : @Model.SchoolEmail</div>
+                    <div class="text-center" style="font-size:10px;">Reg. No. - @Model.RegNo</div>
+
+                    <table width="100%" cellspacing="0" cellpadding="2" style="margin-top:4px; font-size:10px;">
+                        <tr>
+                            <td>School Code - @Model.SchoolCode</td>
+                            <td class="text-center">
+                                <img src="~/images/school-logo.png" height="55" alt="BBNV Logo"
+                                     onerror="this.outerHTML='<div class=pp-logo-placeholder style=width:55px;height:55px;line-height:55px;font-size:12px;>BBNV</div>'" />
+                            </td>
+                            <td class="text-end">Dise Code - @Model.DiseCode</td>
+                        </tr>
+                    </table>
+
+                    <div class="text-center" style="font-size:10px; font-style:italic; margin:2px 0;">
+                        Hindi / English Medium
+                    </div>
+
+                    <div class="pp-details-title">PROGRESS REPORT CARD</div>
+
+                    <div style="font-size:10px; margin-top:4px;">
+                        <div class="text-center pp-bold">Year - @Model.AcademicYear</div>
+                        <div class="text-center pp-bold">Class - @Model.ClassName</div>
+                    </div>
+
+                    <table class="pp-detail-info" width="100%" cellspacing="0" cellpadding="2">
+                        <tr>
+                            <td class="pp-detail-label">Admission No -</td>
+                            <td class="pp-bold">@Model.AdmissionNo</td>
+                        </tr>
+                        <tr>
+                            <td class="pp-detail-label">Student Name -</td>
+                            <td class="pp-bold">@Model.StudentName</td>
+                        </tr>
+                        <tr>
+                            <td class="pp-detail-label">Date of Birth -</td>
+                            <td>@Model.DOB</td>
+                        </tr>
+                        <tr>
+                            <td class="pp-detail-label">Father's Name -</td>
+                            <td>@Model.FatherName</td>
+                        </tr>
+                        <tr>
+                            <td class="pp-detail-label">Mother's Name -</td>
+                            <td>@Model.MotherName</td>
+                        </tr>
+                        <tr>
+                            <td class="pp-detail-label">Caste -</td>
+                            <td>@Model.Caste</td>
+                        </tr>
+                        <tr>
+                            <td class="pp-detail-label">Address -</td>
+                            <td>@Model.Address</td>
+                        </tr>
+                        <tr>
+                            <td class="pp-detail-label">Aadhar No -</td>
+                            <td>@Model.Aadhar</td>
+                        </tr>
+                        <tr>
+                            <td class="pp-detail-label">SSSMID -</td>
+                            <td>@Model.SSSMID</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 </div>
