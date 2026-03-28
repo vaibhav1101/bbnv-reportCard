@@ -62,16 +62,28 @@ public class ReportCardController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        return View(vm);
+        // Resolve level & stream, then route to the matching format view
+        var (level, stream) = SchoolLevelResolver.Resolve(student.ClassName, search.Stream);
+        vm.Level = level;
+        vm.Stream = stream;
+
+        var viewPath = SchoolLevelResolver.ViewPath(level, stream);
+        return View(viewPath, vm);
     }
 
     [HttpGet("ReportCard/Pdf/{studentId:int}")]
-    public async Task<IActionResult> Pdf(int studentId, string term, string academicYear)
+    public async Task<IActionResult> Pdf(int studentId, string term, string academicYear, string? stream = null)
     {
         var vm = await _service.BuildReportCardAsync(studentId, term, academicYear);
         if (vm == null) return NotFound();
 
-        return new ViewAsPdf("Generate", vm)
+        var (level, resolvedStream) = SchoolLevelResolver.Resolve(vm.Student.ClassName, stream);
+        vm.Level = level;
+        vm.Stream = resolvedStream;
+
+        var viewPath = SchoolLevelResolver.ViewPath(level, resolvedStream);
+
+        return new ViewAsPdf(viewPath, vm)
         {
             FileName = $"ReportCard_{vm.Student.RollNumber}_{term}_{academicYear}.pdf",
             PageSize = Rotativa.AspNetCore.Options.Size.A4,
@@ -81,13 +93,14 @@ public class ReportCardController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> ClassList(string className, string section, string term, string academicYear)
+    public async Task<IActionResult> ClassList(string className, string section, string term, string academicYear, string? stream = null)
     {
         var students = await _service.GetStudentsByClassAsync(className, section);
         ViewBag.ClassName = className;
         ViewBag.Section = section;
         ViewBag.Term = term;
         ViewBag.AcademicYear = academicYear;
+        ViewBag.Stream = stream;
         return View(students);
     }
 }

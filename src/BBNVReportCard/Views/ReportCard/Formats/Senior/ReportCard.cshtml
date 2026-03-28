@@ -1,0 +1,56 @@
+@model ReportCardViewModel
+@{
+    ViewData["Title"] = "Senior Report Card";
+    Layout = "_Layout";
+}
+
+{{!-- ============================================================
+     FORMAT: SENIOR  (Class 9 – 10)
+     TODO: Replace with actual BBNV Senior report card layout.
+     ============================================================ --}}
+
+<div class="no-print mb-3 d-flex gap-2 justify-content-end">
+    <a asp-action="Index" class="btn btn-outline-secondary">&#8592; Back</a>
+    <a asp-action="Pdf"
+       asp-route-studentId="@Model.Student.StudentId"
+       asp-route-term="@Model.Term"
+       asp-route-academicYear="@Model.AcademicYear"
+       class="btn btn-danger">&#128438; Download PDF</a>
+    <button onclick="window.print()" class="btn btn-outline-primary">&#128424; Print</button>
+</div>
+
+<div class="report-card">
+    <div class="rc-header text-center">
+        <div class="logo-placeholder">BBNV</div>
+        <h2 class="rc-school-name">@Model.SchoolName</h2>
+        <h4 class="rc-title">SENIOR SCHOOL REPORT CARD</h4>
+        <p class="rc-subtitle">Academic Year: @Model.AcademicYear &nbsp;|&nbsp; @Model.Term</p>
+    </div>
+
+    <hr class="rc-divider" />
+
+    <div class="rc-student-info">
+        <table class="table table-borderless rc-info-table">
+            <tbody>
+                <tr>
+                    <td><strong>Student Name:</strong></td>
+                    <td>@Model.Student.StudentName</td>
+                    <td><strong>Roll No:</strong></td>
+                    <td>@Model.Student.RollNumber</td>
+                </tr>
+                <tr>
+                    <td><strong>Class:</strong></td>
+                    <td>@Model.Student.ClassName - @Model.Student.Section</td>
+                    <td><strong>Father's Name:</strong></td>
+                    <td>@(Model.Student.FatherName ?? "-")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {{!-- TODO: Add Senior (9–10) specific sections here --}}
+
+    <div class="alert alert-warning no-print mt-4">
+        <strong>Format Pending:</strong> Please share the Senior report card layout to complete this template.
+    </div>
+</div>

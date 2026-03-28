@@ -18,6 +18,8 @@ public class ReportCardViewModel
         : null;
     public string? OverallGrade { get; set; }
     public string? Result { get; set; }
+    public SchoolLevel Level { get; set; }
+    public Stream Stream { get; set; } = Stream.None;
 }
 
 public class ReportCardSearchModel
@@ -26,6 +28,7 @@ public class ReportCardSearchModel
     public string? RollNumber { get; set; }
     public string? ClassName { get; set; }
     public string? Section { get; set; }
+    public string? Stream { get; set; }
     public string Term { get; set; } = string.Empty;
     public string AcademicYear { get; set; } = string.Empty;
     public List<ClassOption> AvailableClasses { get; set; } = new();

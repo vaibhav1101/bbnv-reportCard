@@ -17,6 +17,16 @@
                             <input asp-for="AcademicYear" class="form-control" placeholder="e.g. 2025-2026" />
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label fw-semibold">Stream (Class 11 & 12 only)</label>
+                            <select asp-for="Stream" class="form-select">
+                                <option value="">-- Not Applicable --</option>
+                                <option value="Math">Science - Mathematics (PCM)</option>
+                                <option value="Bio">Science - Biology (PCB)</option>
+                                <option value="Commerce">Commerce</option>
+                                <option value="Arts">Arts / Humanities</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Term / Examination</label>
                             <select asp-for="Term" class="form-select">
                                 <option value="">-- Select Term --</option>
