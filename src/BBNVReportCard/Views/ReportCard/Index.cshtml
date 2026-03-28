@@ -1,0 +1,77 @@
+@model ReportCardSearchModel
+@{
+    ViewData["Title"] = "Search Report Card";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Generate Report Card</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Generate" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Academic Year</label>
+                            <input asp-for="AcademicYear" class="form-control" placeholder="e.g. 2025-2026" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Term / Examination</label>
+                            <select asp-for="Term" class="form-select">
+                                <option value="">-- Select Term --</option>
+                                <option value="Term1">Term 1</option>
+                                <option value="Term2">Term 2</option>
+                                <option value="Annual">Annual</option>
+                                <option value="HalfYearly">Half Yearly</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="PreBoard">Pre-Board</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <hr class="my-2" />
+                            <p class="text-muted small mb-2">Search by Roll Number <strong>or</strong> Student ID</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Class</label>
+                            <select asp-for="ClassName" class="form-select">
+                                <option value="">-- Select Class --</option>
+                                @foreach (var cls in Model.AvailableClasses.Select(c => c.ClassName).Distinct())
+                                {
+                                    <option value="@cls">@cls</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Section</label>
+                            <select asp-for="Section" class="form-select">
+                                <option value="">-- Select Section --</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Roll Number</label>
+                            <input asp-for="RollNumber" class="form-control" placeholder="e.g. 101" />
+                        </div>
+
+                        <div class="col-12 text-center text-muted">— OR —</div>
+
+                        <div class="col-md-6 mx-auto">
+                            <label class="form-label fw-semibold">Student ID</label>
+                            <input asp-for="StudentId" type="number" class="form-control" placeholder="Numeric Student ID" />
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Generate Report Card</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

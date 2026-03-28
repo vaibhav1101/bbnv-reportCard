@@ -1,0 +1,23 @@
+{
+  "name": "BBNV Report Card",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-8.0",
+  "features": {
+    "ghcr.io/devcontainers/features/mssql:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "ms-mssql.mssql"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "dotnet.defaultSolution": "src/BBNVReportCard/BBNVReportCard.csproj"
+      }
+    }
+  },
+  "forwardPorts": [5000, 5001],
+  "postCreateCommand": "cd src/BBNVReportCard && dotnet restore",
+  "remoteUser": "vscode"
+}

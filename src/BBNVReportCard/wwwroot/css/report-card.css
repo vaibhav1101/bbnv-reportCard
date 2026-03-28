@@ -1,0 +1,168 @@
+/* =============================================
+   BBNV Report Card Styles
+   ============================================= */
+
+.report-card {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px 40px;
+    border: 1px solid #dee2e6;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+/* Header */
+.rc-header { margin-bottom: 15px; }
+
+.logo-placeholder {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    line-height: 80px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.rc-school-name {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rc-school-address {
+    font-size: 13px;
+    color: #555;
+    margin: 0;
+}
+
+.rc-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.rc-subtitle { font-size: 14px; color: #555; }
+
+.rc-divider { border-top: 2px solid #333; margin: 12px 0; }
+
+/* Student Info */
+.rc-info-table td {
+    padding: 4px 8px;
+    font-size: 14px;
+}
+
+.rc-info-table td:nth-child(odd) {
+    width: 130px;
+    color: #444;
+}
+
+/* Section Titles */
+.rc-section-title {
+    font-size: 15px;
+    font-weight: bold;
+    border-bottom: 1px solid #999;
+    padding-bottom: 4px;
+    margin: 16px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Marks Table */
+.rc-marks-table thead th {
+    background-color: #1a3a6b;
+    color: #fff;
+    font-size: 13px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.rc-marks-table tbody td,
+.rc-marks-table tfoot td {
+    font-size: 13px;
+    vertical-align: middle;
+    padding: 5px 8px;
+}
+
+.rc-table-foot td {
+    background-color: #f1f3f5;
+    font-weight: bold;
+}
+
+/* Attendance */
+.rc-attendance-table td { font-size: 13px; }
+
+/* Grading Scale */
+.rc-scale-table th, .rc-scale-table td {
+    font-size: 12px;
+    padding: 3px 8px;
+}
+
+/* Remarks */
+.rc-remarks-box {
+    min-height: 60px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 13px;
+    background: #fafafa;
+}
+
+/* Signatures */
+.rc-sig-line {
+    border-bottom: 1px solid #333;
+    margin: 40px 20px 6px;
+}
+
+.rc-signatures p {
+    font-size: 13px;
+    margin: 0;
+}
+
+/* =============================================
+   Print Styles — @media print
+   ============================================= */
+@media print {
+    body { margin: 0; padding: 0; background: #fff; }
+
+    .no-print,
+    nav,
+    .alert,
+    .btn,
+    footer { display: none !important; }
+
+    .report-card {
+        max-width: 100%;
+        border: none;
+        padding: 10mm 15mm;
+        margin: 0;
+    }
+
+    .rc-marks-table thead th {
+        background-color: #1a3a6b !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .rc-table-foot td {
+        background-color: #f1f3f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .container { max-width: 100%; padding: 0; }
+
+    a { text-decoration: none !important; color: inherit !important; }
+
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
+    }
+}

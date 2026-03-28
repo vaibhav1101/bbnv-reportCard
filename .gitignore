@@ -1,0 +1,46 @@
+## .NET / ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.swp
+*.sln.docstates
+
+## Build artifacts
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/packages/build/
+nuget.exe
+
+## User secrets / environment
+appsettings.Production.json
+appsettings.Local.json
+secrets.json
+.env
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Rotativa wkhtmltopdf binaries (large, download separately)
+**/Rotativa/Linux/
+**/Rotativa/Windows/
+**/Rotativa/Mac/

@@ -1,0 +1,204 @@
+@model ReportCardViewModel
+@{
+    ViewData["Title"] = "Report Card";
+    Layout = "_Layout";
+}
+
+<div class="no-print mb-3 d-flex gap-2 justify-content-end">
+    <a asp-action="Index" class="btn btn-outline-secondary">&#8592; Back</a>
+    <a asp-action="Pdf" asp-route-studentId="@Model.Student.StudentId"
+       asp-route-term="@Model.Term"
+       asp-route-academicYear="@Model.AcademicYear"
+       class="btn btn-danger">&#128438; Download PDF</a>
+    <button onclick="window.print()" class="btn btn-outline-primary">&#128424; Print</button>
+</div>
+
+<div class="report-card">
+    <!-- School Header -->
+    <div class="rc-header text-center">
+        <div class="rc-school-logo">
+            <!-- Replace with actual logo: <img src="~/images/school-logo.png" height="80" /> -->
+            <div class="logo-placeholder">BBNV</div>
+        </div>
+        <h2 class="rc-school-name">@Model.SchoolName</h2>
+        @if (!string.IsNullOrWhiteSpace(Model.SchoolAddress))
+        {
+            <p class="rc-school-address">@Model.SchoolAddress</p>
+        }
+        <h4 class="rc-title">REPORT CARD</h4>
+        <p class="rc-subtitle">Academic Year: @Model.AcademicYear &nbsp;|&nbsp; @Model.Term</p>
+    </div>
+
+    <hr class="rc-divider" />
+
+    <!-- Student Info -->
+    <div class="rc-student-info">
+        <table class="table table-borderless rc-info-table">
+            <tbody>
+                <tr>
+                    <td><strong>Student Name:</strong></td>
+                    <td>@Model.Student.StudentName</td>
+                    <td><strong>Roll No:</strong></td>
+                    <td>@Model.Student.RollNumber</td>
+                </tr>
+                <tr>
+                    <td><strong>Class:</strong></td>
+                    <td>@Model.Student.ClassName - @Model.Student.Section</td>
+                    <td><strong>Date of Birth:</strong></td>
+                    <td>@(Model.Student.DateOfBirth?.ToString("dd MMM yyyy") ?? "-")</td>
+                </tr>
+                @if (!string.IsNullOrWhiteSpace(Model.Student.FatherName))
+                {
+                    <tr>
+                        <td><strong>Father's Name:</strong></td>
+                        <td>@Model.Student.FatherName</td>
+                        <td><strong>Mother's Name:</strong></td>
+                        <td>@(Model.Student.MotherName ?? "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Marks Table -->
+    <div class="rc-marks-section">
+        <h5 class="rc-section-title">Academic Performance</h5>
+        <table class="table table-bordered rc-marks-table">
+            <thead class="rc-table-head">
+                <tr>
+                    <th>Subject</th>
+                    <th class="text-center">Max Marks</th>
+                    <th class="text-center">Marks Obtained</th>
+                    <th class="text-center">Grade</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var subject in Model.Subjects)
+                {
+                    <tr>
+                        <td>@subject.SubjectName</td>
+                        <td class="text-center">@(subject.MaxMarks?.ToString("0") ?? "-")</td>
+                        <td class="text-center @(subject.MarksObtained < 33 ? "text-danger fw-bold" : "")">
+                            @(subject.MarksObtained?.ToString("0.0") ?? "AB")
+                        </td>
+                        <td class="text-center fw-semibold">@(subject.Grade ?? "-")</td>
+                        <td>@(subject.Remarks ?? "")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="rc-table-foot">
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td class="text-center"><strong>@(Model.TotalMaxMarks?.ToString("0") ?? "-")</strong></td>
+                    <td class="text-center"><strong>@(Model.TotalMarksObtained?.ToString("0.0") ?? "-")</strong></td>
+                    <td class="text-center"><strong>@(Model.OverallGrade ?? "-")</strong></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        <strong>Percentage: @(Model.Percentage?.ToString("0.00") ?? "-")%</strong>
+                        &nbsp;&nbsp;&nbsp;
+                        <strong class="@(Model.Result == "PASS" ? "text-success" : "text-danger")">
+                            Result: @(Model.Result ?? "-")
+                        </strong>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Attendance -->
+    @if (Model.Student.TotalWorkingDays > 0)
+    {
+        <div class="rc-attendance">
+            <h5 class="rc-section-title">Attendance</h5>
+            <table class="table table-bordered rc-attendance-table" style="max-width:400px;">
+                <tbody>
+                    <tr>
+                        <td>Total Working Days</td>
+                        <td class="text-center">@Model.Student.TotalWorkingDays</td>
+                    </tr>
+                    <tr>
+                        <td>Days Present</td>
+                        <td class="text-center">@Model.Student.DaysPresent</td>
+                    </tr>
+                    <tr>
+                        <td>Attendance %</td>
+                        <td class="text-center">
+                            @(Model.Student.TotalWorkingDays > 0
+                                ? $"{Math.Round((double)Model.Student.DaysPresent! / Model.Student.TotalWorkingDays.Value * 100, 1)}%"
+                                : "-")
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Grading Scale -->
+    <div class="rc-grade-scale">
+        <h5 class="rc-section-title">Grading Scale</h5>
+        <table class="table table-bordered table-sm rc-scale-table" style="max-width:400px;">
+            <thead><tr><th>Grade</th><th>Percentage</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td>A+</td><td>91% - 100%</td><td>Outstanding</td></tr>
+                <tr><td>A</td><td>81% - 90%</td><td>Excellent</td></tr>
+                <tr><td>B+</td><td>71% - 80%</td><td>Very Good</td></tr>
+                <tr><td>B</td><td>61% - 70%</td><td>Good</td></tr>
+                <tr><td>C</td><td>51% - 60%</td><td>Average</td></tr>
+                <tr><td>D</td><td>41% - 50%</td><td>Below Average</td></tr>
+                <tr><td>F</td><td>Below 40%</td><td>Fail</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Remarks -->
+    <div class="rc-remarks">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Class Teacher's Remarks:</strong></p>
+                <div class="rc-remarks-box">
+                    @(Model.ClassTeacherRemarks ?? "")
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.ClassTeacherName))
+                {
+                    <p class="mt-2 text-end"><em>— @Model.ClassTeacherName</em></p>
+                }
+            </div>
+            <div class="col-md-6">
+                <p><strong>Principal's Remarks:</strong></p>
+                <div class="rc-remarks-box">
+                    @(Model.PrincipalRemarks ?? "")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signatures -->
+    <div class="rc-signatures">
+        <div class="row mt-4">
+            <div class="col-4 text-center">
+                <div class="rc-sig-line"></div>
+                <p>Class Teacher</p>
+            </div>
+            <div class="col-4 text-center">
+                <div class="rc-sig-line"></div>
+                <p>Parent / Guardian</p>
+            </div>
+            <div class="col-4 text-center">
+                <div class="rc-sig-line"></div>
+                <p>Principal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Auto-trigger print if URL has ?print=1
+    if (new URLSearchParams(window.location.search).get('print') === '1') {
+        window.onload = () => window.print();
+    }
+</script>
+}
